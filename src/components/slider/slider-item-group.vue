@@ -45,10 +45,10 @@ export default {
       this.$el.addEventListener('touchmove', this.dragMove, false)
       this.$el.addEventListener('touchend', this.dragEnd, false)
       // 监听触摸
-      this.$el.addEventListener('mousedown', this.dragStart, false)
-      this.$el.addEventListener('mousemove', this.dragMove, false)
-      this.$el.addEventListener('mouseup', this.dragEnd, false)
-      this.$el.addEventListener('mouseleave', this.dragEnd, false)
+      // this.$el.addEventListener('mousedown', this.dragStart, false)
+      // this.$el.addEventListener('mousemove', this.dragMove, false)
+      // this.$el.addEventListener('mouseup', this.dragEnd, false)
+      // this.$el.addEventListener('mouseleave', this.dragEnd, false)
     },
     dragStart (e) {
       this.dragStartKey = true
@@ -57,10 +57,10 @@ export default {
       } else if (e.type === 'touchstart') {
         this.touchKey = true
       }
-      e.preventDefault()
-      console.log('触摸移动中' + e.type)
     },
     dragMove (e) {
+      //  阻止浏览器默认事件
+      e.preventDefault()
       if (!this.dragStartKey) return
       if (e.type === 'mousedown' && !this.mouseKey) return
       if (e.type === 'touchstart' && !this.touchKey) return
@@ -73,8 +73,6 @@ export default {
       this.$el.style.transitionDuration = '0ms'
       // 设置item-group的X偏移
       this.$el.style.transform = `translate3d(${-this.itemWidth + this.deltaX}px, 0, 0)`
-      console.log('差值为' + this.deltaX)
-      console.log('触摸移动中' + e.type)
     },
     dragEnd (e) {
       if (!this.dragStartKey) return
@@ -98,7 +96,6 @@ export default {
       // 归零dragStartX、deltaX
       this.dragStartX = 0
       this.deltaX = 0
-      console.log('触摸结束' + e.type)
     },
     pre () {
       //  恢复过渡
@@ -111,7 +108,7 @@ export default {
       setTimeout(() => {
         this.$el.style.transitionDuration = '0ms'
         this.$el.style.transform = `translate3d(${-this.itemWidth}px, 0, 0)`
-      }, 300)
+      }, 310)
     },
     next () {
       //  恢复过渡
@@ -124,7 +121,7 @@ export default {
       setTimeout(() => {
         this.$el.style.transitionDuration = '0ms'
         this.$el.style.transform = `translate3d(${-this.itemWidth}px, 0, 0)`
-      }, 310)
+      }, 320)
     }
   }
 

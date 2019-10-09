@@ -1,3 +1,5 @@
+// 引入浏览器本地存储包，用于存储todolist
+let localStorage = require('store')
 const getYearMonthDayWeek = function (date) {
   date = new Date(date.getTime())
   let year = date.getFullYear()
@@ -28,5 +30,6 @@ const getPanelDays = function (date) {
 
 export default {
   getPanelDays,
-  getYearMonthDayWeek
+  getYearMonthDayWeek,
+  localStorage
 }

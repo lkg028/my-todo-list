@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <app-bar></app-bar>
-    <router-view/>
+    <keep-alive><router-view/></keep-alive>
     <!-- <slider class="container">
       <slider-item-group @now="changeData">
         <slider-item>
@@ -52,8 +52,5 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.container
-    background-color #FFF
-    margin .3rem .2rem
-    font-size .32rem
+
 </style>

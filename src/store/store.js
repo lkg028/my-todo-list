@@ -26,7 +26,6 @@ export default new Vuex.Store({
       state.month = month
       state.day = day
       state.week = week
-      console.log(state)
     }
   }
 })

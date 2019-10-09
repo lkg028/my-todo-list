@@ -8,6 +8,8 @@ import store from './store/store.js'
 import 'styles/reset.css'
 import 'styles/border.css'
 import 'styles/style.css'
+// 引入字体图标
+import 'styles/iconfont.css'
 // 引入fastclick解决移动端300毫秒点击延迟事件
 import fastclick from 'fastclick'
 fastclick.attach(document.body)
@@ -17,6 +19,7 @@ new Vue({
   el: '#app',
   router,
   store,
+  localStorage,
   components: { App },
   template: '<App/>'
 })
