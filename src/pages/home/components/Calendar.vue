@@ -9,7 +9,6 @@
 </template>
 <script>
 import util from '@/util.js'
-import dayPicker from './dayPicker'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 let {localStorage} = util
 export default {
@@ -20,7 +19,7 @@ export default {
     }
   },
   components: {
-    dayPicker
+    dayPicker: () => import('./dayPicker')
   },
   methods: {
     ...mapMutations(['update'])
@@ -55,7 +54,7 @@ export default {
       tempHasTodo.forEach((item, idx) => {
         tempHasTodo[idx] = JSON.parse(item)
       })
-      console.log(tempHasTodo)
+      // console.log(tempHasTodo)
       this.hasTodo = tempHasTodo
     }
   },

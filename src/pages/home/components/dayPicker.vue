@@ -109,10 +109,6 @@
 </template>
 <script>
 import util from '@/util.js'
-// 引入slider组件，使可以滑动选择日期
-import slider from '@/components/slider/Slider'
-import sliderItemGroup from '@/components/slider/slider-item-group'
-import sliderItem from '@/components/slider/slider-item'
 export default {
   data () {
     return {
@@ -127,9 +123,9 @@ export default {
     }
   },
   components: {
-    slider,
-    sliderItemGroup,
-    sliderItem
+    slider: () => import('@/components/slider/Slider'),
+    sliderItemGroup: () => import('@/components/slider/slider-item-group'),
+    sliderItem: () => import('@/components/slider/slider-item')
   },
   props: {
     assignDate: {

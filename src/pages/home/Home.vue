@@ -5,12 +5,10 @@
   </div>
 </template>
 <script>
-import Calendar from './components/Calendar'
-import Todo from '../todo/Todo'
 export default {
   components: {
-    Calendar,
-    Todo
+    Calendar: () => import('./components/Calendar'),
+    Todo: () => import('../todo/Todo')
   }
 }
 </script>

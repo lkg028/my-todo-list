@@ -2,7 +2,6 @@
   <div class="slider"><slot></slot></div>
 </template>
 <script>
-import sliderItemGroup from './slider-item-group'
 export default {
   data () {
     return {
@@ -11,7 +10,7 @@ export default {
     }
   },
   components: {
-    sliderItemGroup
+    sliderItemGroup: () => import('./slider-item-group')
   },
   mounted () {
     this.initWidth()

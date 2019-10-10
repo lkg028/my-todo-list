@@ -51,13 +51,12 @@
 </template>
 <script>
 import util from '@/util.js'
-import add from './add'
 import { mapState, mapMutations } from 'vuex'
 import axios from 'axios'
 let {localStorage} = util
 export default {
   components: {
-    add
+    add: () => import('./add')
   },
   data () {
     return {
@@ -146,7 +145,7 @@ export default {
     if (!secondLoad) {
       // 浏览器第一次加载页面，初始数据
 
-      axios.get('/static/mock/init-todo.json')
+      axios.get('/demo/todo/static/mock/init-todo.json')
         .then((res) => {
           let {year, month, day} = util.getYearMonthDayWeek(new Date())
           res.data.forEach((item, idx) => {
