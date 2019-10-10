@@ -15,7 +15,10 @@ export default {
   },
   mounted () {
     this.initWidth()
-    console.log(this.itemWidth)
+    // 当窗口尺寸调整的时候，重新调整slider组件
+    window.addEventListener('resize', () => {
+      this.initWidth()
+    }, false)
   },
   methods: {
     // 初始化宽度：slider宽度，slider-item-group宽度，item宽度

@@ -5,6 +5,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     selectDate: new Date(),
+    updateTagKey: (new Date()).getTime(), // 通过修改store中这个时间戳的方式，通知日历组件上的标志
     year: 0,
     month: 0,
     day: 0,
@@ -26,6 +27,9 @@ export default new Vuex.Store({
       state.month = month
       state.day = day
       state.week = week
+    },
+    updateTag (state) {
+      state.updateTagKey = (new Date()).getTime()
     }
   }
 })

@@ -4,17 +4,19 @@
       <span>{{year}}年{{month}}月{{day}}日 周{{cnDay}}</span>
       <span>{{deltaDate}}</span>
     </div>
-    <day-picker v-bind:assignDate="cloneSelectDate" @changeDate='update'></day-picker>
+    <day-picker v-bind:assignDate="cloneSelectDate" @changeDate='update' :hasTodo="hasTodo"></day-picker>
   </div>
 </template>
 <script>
 import util from '@/util.js'
 import dayPicker from './dayPicker'
 import { mapState, mapMutations, mapGetters } from 'vuex'
+let {localStorage} = util
 export default {
   data () {
     return {
-      today: new Date()
+      today: new Date(),
+      hasTodo: []
     }
   },
   components: {
@@ -24,7 +26,7 @@ export default {
     ...mapMutations(['update'])
   },
   computed: {
-    ...mapState(['selectDate', 'year', 'month', 'day', 'week']),
+    ...mapState(['selectDate', 'year', 'month', 'day', 'week', 'updateTagKey']),
     ...mapGetters(['cnDay', 'cloneSelectDate']),
     deltaDate () {
       let {year, month, day} = util.getYearMonthDayWeek(this.today)
@@ -39,6 +41,22 @@ export default {
         tempStr = `${Math.round(-deltaDateNumber / 86400000)}天前`
       }
       return tempStr
+    }
+  },
+  watch: {
+    updateTagKey () {
+      // 通过监听store中的'updateTagKey'时间戳的变化，去更新日历打标数据
+      // 构建对象数组，sortTime字段（打标在哪一天），tagColor字段（打标的颜色）【还未实现颜色】
+      let tempHasTodo = []
+      localStorage.each((val, key) => {
+        if (val.type === 'todo' && (!val.hasDele)) tempHasTodo.push(JSON.stringify(val.sortTime))
+      })
+      tempHasTodo = [...new Set(tempHasTodo)]
+      tempHasTodo.forEach((item, idx) => {
+        tempHasTodo[idx] = JSON.parse(item)
+      })
+      console.log(tempHasTodo)
+      this.hasTodo = tempHasTodo
     }
   },
   mounted () {

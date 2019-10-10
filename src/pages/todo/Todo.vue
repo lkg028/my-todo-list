@@ -1,32 +1,50 @@
 <template>
   <div class="container">
-    <!-- 根据所选的日期，渲染出当前日期所有代办事项以及已经完成的事项 -->
-    <h3>待处理</h3>
-    <ul class="todo-list">
-      <li v-for="(item, idx) in notFinished" v-bind:key="item.key">
-        <span class="todo-tag iconfont" @click="toFinished(idx)">&#xe71e;</span>
-        <span @click="edit(item.key)"  class="desc">
-          {{item.data.desc}}<br>{{item.data.isImportant ? '重要任务' : '一般任务'}}
-        </span>
-        <span class="important-tag iconfont" @click="importantChange(idx)">
-          {{item.data.isImportant ? '&#xe605;' : '&#xe600;'}}
-        </span>
-      </li>
-    </ul>
-    <h3>已完成</h3>
-    <ul class="todo-list finished">
-      <li v-for="(item, idx) in hasFinished" v-bind:key="item.key">
-        <span class="todo-tag iconfont" @click="toUnfinished(idx)">&#xe60d;</span>
-        <span class="desc">
-          {{item.data.desc}}<br>{{item.data.isImportant ? '重要任务' : '一般任务'}}
-        </span>
-        <span class="important-tag iconfont">
-          {{item.data.isImportant ? '&#xe605;' : '&#xe600;'}}
-        </span>
-      </li>
-    </ul>
-    <!-- 输入区域 -->
-    <add v-bind:add-or-edit="addOrEdit" v-bind:edit-key="editKey" @submit="closeEdit" v-show="showEditKey"></add>
+    <template v-if="thatDayTodo.length">
+      <!-- 根据所选的日期，渲染出当前日期所有代办事项以及已经完成的事项 -->
+      <h3>待处理</h3>
+      <template v-if="notFinished.length">
+        <ul class="todo-list">
+          <li v-for="(item, idx) in notFinished" v-bind:key="item.key" v-swipeout>
+            <div class="todo-tag iconfont" @click="toFinished(idx)">&#xe71e;</div>
+            <div @click="edit(item.key)"  class="desc">
+              <span>{{item.data.desc}}</span>
+              <span class="important-desc">{{item.data.isImportant ? '重要任务' : '一般任务'}}</span>
+            </div>
+            <div class="important-tag iconfont" @click="importantChange(idx)">
+              {{item.data.isImportant ? '&#xe605;' : '&#xe600;'}}
+            </div>
+            <div class="dele-btn iconfont" @click="removeItem(item.key)">&#xe652;</div>
+          </li>
+        </ul>
+      </template>
+      <template v-if="!notFinished.length">
+        <p style="text-align:center">nice!&nbsp;&nbsp;事情都搞定了</p>
+      </template>
+      <h3>已完成</h3>
+      <template v-if="hasFinished.length">
+        <ul class="todo-list finished">
+          <li v-for="(item, idx) in hasFinished" v-bind:key="item.key" v-swipeout>
+            <div class="todo-tag iconfont" @click="toUnfinished(idx)">&#xe60d;</div>
+            <div class="desc">
+              {{item.data.desc}}<br>{{item.data.isImportant ? '重要任务' : '一般任务'}}
+            </div>
+            <div class="important-tag iconfont">
+              {{item.data.isImportant ? '&#xe605;' : '&#xe600;'}}
+            </div>
+            <div class="dele-btn iconfont" @click="removeItem(item.key)">&#xe652;</div>
+          </li>
+        </ul>
+      </template>
+      <template v-if="!hasFinished.length">
+        <p style="text-align:center">加油，小伙子!&nbsp;&nbsp;放开干吧</p>
+      </template>
+      <!-- 输入区域 -->
+      <add v-bind:add-or-edit="addOrEdit" v-bind:edit-key="editKey" @submit="closeEdit" v-show="showEditKey"></add>
+    </template>
+    <template v-if="!thatDayTodo.length">
+      <p>哈哈，这一天啥事都没有。</p>
+    </template>
     <!-- 添加按钮 -->
     <span class="add-todo-btn iconfont" v-show="!showEditKey" @click="addBtnClick">&#xe692;</span>
   </div>
@@ -34,7 +52,8 @@
 <script>
 import util from '@/util.js'
 import add from './add'
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
+import axios from 'axios'
 let {localStorage} = util
 export default {
   components: {
@@ -48,6 +67,51 @@ export default {
       showEditKey: false,
       addOrEdit: '',
       editKey: 0
+    }
+  },
+  directives: {
+    swipeout: {
+      bind (el) {
+        let deltaX = 0
+        let startX = 0
+        let dragKey = false
+        let time = null
+        let dragStart = (e) => {
+          console.log('dragStrat')
+          dragKey = true
+        }
+        let dragMove = (e) => {
+          console.log('dragMove')
+          let screenX = e.changedTouches[0].screenX
+          if (dragKey) {
+            if (!startX) startX = screenX
+            deltaX = screenX - startX
+          }
+          // e.preventDefault()
+        }
+        let dragEnd = (e) => {
+          if (deltaX < -30) el.style.transform = 'translate3d(-1rem,0,0)'
+          if (!time) {
+            time = setTimeout(() => {
+              el.style.transform = 'translate3d(0,0,0)'
+              time = null
+            }, 1000)
+          } else {
+            clearTimeout(time)
+            time = setTimeout(() => {
+              el.style.transform = 'translate3d(0,0,0)'
+              time = null
+            }, 1000)
+          }
+          // 初始化原始数据
+          deltaX = 0
+          startX = 0
+          dragKey = false
+        }
+        el.addEventListener('touchstart', dragStart, false)
+        el.addEventListener('touchmove', dragMove, false)
+        el.addEventListener('touchend', dragEnd, false)
+      }
     }
   },
   computed: {
@@ -71,49 +135,44 @@ export default {
     // 选择的时间变动，从新获取数据
     selectDate () {
       this.initThatDayTodo()
+    },
+    thatDayTodo () {
+      // 当todo有数据更新的时候，使用时间戳通知日历组件更新打标
+      this.updateTag()
     }
   },
   created () {
-    console.log(localStorage)
-    //  需要优化，没有数据的时候，存一条测试信息进去
-    localStorage.set('1570467988001', {
-      type: 'todo',
-      sortTime: {year: 2019, month: 10, day: 8},
-      isImportant: false,
-      desc: '海南粉腌粉配老干妈',
-      hasFinished: true,
-      hasDele: false
-    })
-    localStorage.set('1570467988241', {
-      type: 'todo',
-      sortTime: {year: 2019, month: 10, day: 8},
-      isImportant: true,
-      desc: '吃油条配豆浆',
-      hasFinished: false,
-      hasDele: false
-    })
-    localStorage.set('1570467988299', {
-      type: 'todo',
-      sortTime: {year: 2019, month: 10, day: 8},
-      isImportant: true,
-      desc: '这条是已经删除的todo',
-      hasFinished: false,
-      hasDele: true
-    })
-    // 初始化数据，把数据从localStorage中读取出来，存储到data中
-    this.initThatDayTodo()
+    let secondLoad = localStorage.get('secondLoad')
+    if (!secondLoad) {
+      // 浏览器第一次加载页面，初始数据
+
+      axios.get('/static/mock/init-todo.json')
+        .then((res) => {
+          let {year, month, day} = util.getYearMonthDayWeek(new Date())
+          res.data.forEach((item, idx) => {
+            if (!item.sortTime) item.sortTime = {year, month, day}
+            localStorage.set((new Date()).getTime() + idx * 100, item)
+          })
+          // 初始化数据，把数据从localStorage中读取出来，存储到data中
+          this.initThatDayTodo()
+          localStorage.set('secondLoad', true)
+        })
+    } else {
+      this.initThatDayTodo()
+    }
   },
   methods: {
+    ...mapMutations(['updateTag']),
     initThatDayTodo () {
       let tempDayTodo = []
+      // 遍历本地存储，获得当天的未删除的条目
       localStorage.each((val, key) => {
-        console.log(!val.hasDele)
         if (val.type === 'todo' && (!val.hasDele) && val.sortTime.year === this.year &&
           val.sortTime.month === this.month && val.sortTime.day === this.day) {
           tempDayTodo.push({key: +key, data: val})
-          console.log('数据被存储了')
         }
       })
+      // 对遍历的结果，根据时间戳的先后进行排序
       tempDayTodo.sort((a, b) => {
         return a.key - b.key
       })
@@ -170,6 +229,16 @@ export default {
       data.isImportant = !data.isImportant
       // 存入localStorage
       localStorage.set(key, data)
+    },
+    removeItem (key) {
+      console.log('元素传来的' + key)
+      this.thatDayTodo.forEach((item, idx) => {
+        if (item.key === key) {
+          item.data.hasDele = true
+          this.thatDayTodo.splice(idx, 1)
+          localStorage.set(item.key, item.data)
+        }
+      })
     }
   }
 }
@@ -190,11 +259,24 @@ export default {
         padding .15rem 0
         border-radius .1rem
         margin .2rem 0
-        span
+        position relative
+        transition-property transform
+        transition-duration 100ms
+        transition-timing-function ease-in
+        div
           flex 1 1 auto
           display inline-flex
           align-items center
-          line-height 1.2
+          line-height 1.3
+        .desc
+          display flex
+          flex-direction column
+          justify-content center
+          align-items flex-start
+          span
+            flex 1 1 auto
+          .important-desc
+            color gray
         .todo-tag
           margin 0 .25rem
           flex 0 0 auto
@@ -203,6 +285,20 @@ export default {
           margin 0 .25rem
           flex 0 0 auto
           font-size .4rem
+        .dele-btn
+          position absolute
+          display inline-block
+          width .8rem
+          height .8rem
+          line-height .8rem
+          top 50%
+          right -1rem
+          margin-top -0.4rem
+          text-align center
+          border-radius .4rem
+          font-size .4rem
+          color #fff
+          background-color #f20c00
     .finished
       li
         color #ccc

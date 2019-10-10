@@ -52,5 +52,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
+  #app
+    padding 1rem 0 1.2rem
 </style>

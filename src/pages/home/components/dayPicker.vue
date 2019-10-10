@@ -15,42 +15,51 @@
           <span v-for="item in cnDay" v-bind:key="item">{{item}}</span>
         </div>
         <slider>
+          <!-- 上个月 -->
           <slider-item-group @now="changeMonth">
             <slider-item>
               <div   class="day-cell-body">
                 <div v-for="i in 5" v-bind:key="i" class="day-row">
-                  <span v-for="j in 7" v-bind:key="`${i}+${j}`"
+                  <div v-for="j in 7" v-bind:key="`${i}+${j}`"
                     v-bind:class="{'now-month': isNowMonth(prePanelDay[j + (i - 1) * 7 - 1], 'pre'),
                       'now-day': isNowDay(prePanelDay[j + (i - 1) * 7 - 1], 'pre')
-                    }"
+                    }" class="day-cell"
                   >
-                  {{prePanelDay[j + (i - 1) * 7 - 1].getDate()}}</span>
+                    <span class="has-todo" v-show="showTodoTag(prePanelDay[j + (i - 1) * 7 - 1])"></span>
+                    <span>{{prePanelDay[j + (i - 1) * 7 - 1].getDate()}}</span>
+                  </div>
                 </div>
               </div>
             </slider-item>
+            <!-- 本月 -->
             <slider-item>
               <div   class="day-cell-body">
                 <div v-for="i in 5" v-bind:key="i" class="day-row">
-                  <span v-for="j in 7" v-bind:key="`${i}+${j}`"
+                  <div v-for="j in 7" v-bind:key="`${i}+${j}`"
                     v-bind:class="{'now-month': isNowMonth(nowPanelDay[j + (i - 1) * 7 - 1], 'now'),
                       'now-day': isNowDay(nowPanelDay[j + (i - 1) * 7 - 1], 'now'),
                       'assign-day': isAssignDay(nowPanelDay[j + (i - 1) * 7 - 1])
                     }"
+                    class="day-cell"
                     v-on:click="updateDate(nowPanelDay[j + (i - 1) * 7 - 1])"
                   >
-                  {{nowPanelDay[j + (i - 1) * 7 - 1].getDate()}}</span>
+                    <span class="has-todo" v-show="showTodoTag(nowPanelDay[j + (i - 1) * 7 - 1])"></span>
+                    <span>{{nowPanelDay[j + (i - 1) * 7 - 1].getDate()}}</span>
+                  </div>
                 </div>
               </div>
             </slider-item>
+            <!-- 下个月 -->
             <slider-item>
               <div   class="day-cell-body">
                 <div v-for="i in 5" v-bind:key="i" class="day-row">
-                  <span v-for="j in 7" v-bind:key="`${i}+${j}`"
+                  <div v-for="j in 7" v-bind:key="`${i}+${j}`"
                     v-bind:class="{'now-month': isNowMonth(nextPanelDay[j + (i - 1) * 7 - 1], 'next'),
                                     'now-day': isNowDay(nextPanelDay[j + (i - 1) * 7 - 1], 'next')
-                    }"
+                    }" class="day-cell"
                   >
-                  {{nextPanelDay[j + (i - 1) * 7 - 1].getDate()}}</span>
+                  {{nextPanelDay[j + (i - 1) * 7 - 1].getDate()}}
+                  </div>
                 </div>
               </div>
             </slider-item>
@@ -126,6 +135,10 @@ export default {
     assignDate: {
       type: Date,
       default: new Date()
+    },
+    hasTodo: {
+      type: Array,
+      default () { return [] }
     }
   },
   computed: {
@@ -184,6 +197,17 @@ export default {
     }
   },
   methods: {
+    showTodoTag (cellDate) {
+      let {year, month, day} = util.getYearMonthDayWeek(cellDate)
+      let showKey = false
+      for (let item of this.hasTodo) {
+        if (item.year === year && item.month === month && item.day === day) {
+          showKey = true
+          break
+        }
+      }
+      return showKey
+    },
     isNowMonth (cellDate, whichMonth) {
       switch (whichMonth) {
         case 'pre':
@@ -344,7 +368,8 @@ export default {
         .day-row
           display table-row
           width 100%
-          span
+          .day-cell
+            position relative
             display table-cell
             box-sizing border-box
             text-align center
@@ -352,9 +377,16 @@ export default {
             border 1px solid transparent
             color gray
             font-size .36rem
-          // span:hover
-          //   border-color #419cff
-          //   border-radius .1rem
+          .has-todo
+            position absolute
+            display inline-block
+            width .1rem
+            height .1rem
+            top 3%
+            left 50%
+            margin-left -0.05rem
+            background-color #419dff
+            border-radius 0.05rem
           .now-month
             font-weight bold
             color #000

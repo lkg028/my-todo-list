@@ -15,10 +15,6 @@ export default {
       deltaX: 0
     }
   },
-  mounted () {
-    console.log('这里是slider-item-group')
-    console.log('子组件的个数为' + this.$children.length)
-  },
   methods: {
     // 初始化宽度：slider-item-group宽度，item宽度(由父组件slider触发执行)
     initWidth (itemWidth) {
