@@ -15,9 +15,13 @@ export default {
       deltaX: 0
     }
   },
+  mounted () {
+    console.log('这里是slider-item-group：mounted')
+  },
   methods: {
     // 初始化宽度：slider-item-group宽度，item宽度(由父组件slider触发执行)
     initWidth (itemWidth) {
+      console.log('这里是：slider-item-group')
       if (!itemWidth) return
       // 记录宽度
       this.itemWidth = itemWidth
@@ -27,7 +31,6 @@ export default {
       this.$el.style.transform = `translate3d(${-itemWidth}px, 0, 0)`
       // 通知item修改宽度
       this.$children.forEach((item, idx) => {
-        console.log(idx)
         item.itemWidth = itemWidth
         item.$el.style.width = itemWidth + 'px'
       })

@@ -25,7 +25,7 @@
                       'now-day': isNowDay(prePanelDay[j + (i - 1) * 7 - 1], 'pre')
                     }" class="day-cell"
                   >
-                    <span class="has-todo" v-show="showTodoTag(prePanelDay[j + (i - 1) * 7 - 1])"></span>
+                    <span class="has-tag" v-show="showTag(prePanelDay[j + (i - 1) * 7 - 1])"></span>
                     <span>{{prePanelDay[j + (i - 1) * 7 - 1].getDate()}}</span>
                   </div>
                 </div>
@@ -43,7 +43,7 @@
                     class="day-cell"
                     v-on:click="updateDate(nowPanelDay[j + (i - 1) * 7 - 1])"
                   >
-                    <span class="has-todo" v-show="showTodoTag(nowPanelDay[j + (i - 1) * 7 - 1])"></span>
+                    <span class="has-tag" v-show="showTag(nowPanelDay[j + (i - 1) * 7 - 1])"></span>
                     <span>{{nowPanelDay[j + (i - 1) * 7 - 1].getDate()}}</span>
                   </div>
                 </div>
@@ -58,7 +58,8 @@
                                     'now-day': isNowDay(nextPanelDay[j + (i - 1) * 7 - 1], 'next')
                     }" class="day-cell"
                   >
-                  {{nextPanelDay[j + (i - 1) * 7 - 1].getDate()}}
+                    <span class="has-tag" v-show="showTag(nowPanelDay[j + (i - 1) * 7 - 1])"></span>
+                    <span>{{nextPanelDay[j + (i - 1) * 7 - 1].getDate()}}</span>
                   </div>
                 </div>
               </div>
@@ -108,6 +109,9 @@
   </div>
 </template>
 <script>
+import slider from '@/components/slider/Slider'
+import sliderItemGroup from '@/components/slider/slider-item-group'
+import sliderItem from '@/components/slider/slider-item'
 import util from '@/util.js'
 export default {
   data () {
@@ -123,16 +127,16 @@ export default {
     }
   },
   components: {
-    slider: () => import('@/components/slider/Slider'),
-    sliderItemGroup: () => import('@/components/slider/slider-item-group'),
-    sliderItem: () => import('@/components/slider/slider-item')
+    slider,
+    sliderItemGroup,
+    sliderItem
   },
   props: {
     assignDate: {
       type: Date,
       default: new Date()
     },
-    hasTodo: {
+    hasTags: {
       type: Array,
       default () { return [] }
     }
@@ -193,10 +197,10 @@ export default {
     }
   },
   methods: {
-    showTodoTag (cellDate) {
+    showTag (cellDate) {
       let {year, month, day} = util.getYearMonthDayWeek(cellDate)
       let showKey = false
-      for (let item of this.hasTodo) {
+      for (let item of this.hasTags) {
         if (item.year === year && item.month === month && item.day === day) {
           showKey = true
           break
@@ -373,7 +377,7 @@ export default {
             border 1px solid transparent
             color gray
             font-size .36rem
-          .has-todo
+          .has-tag
             position absolute
             display inline-block
             width .1rem

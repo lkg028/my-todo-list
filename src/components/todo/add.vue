@@ -2,7 +2,7 @@
   <div class="add-todo-item" @click="enFocus">
     <div class="input-wrap">
       <span class="todo-tag iconfont">&#xe71e;</span>
-      <input type="text" placeholder="添加任务" v-model="editItem.desc"
+      <input type="text" placeholder="添加任务" v-model="editItem.desc" @keyup.enter="submit('confirm')" @search="submit('confirm')"
           ref="input" autofocus="autofocus" @blur="inputBlurFn"
       >
       <span class="todo-add-btn iconfont" @click="submit('confirm')">&#xe631;</span>
@@ -10,7 +10,7 @@
     <div class="option">
       <div class="assign-date">
         <span class="iconfont">&#xe632;</span>
-        {{year}}年{{month}}月{{day}}日
+        {{selectSortTime.year}}年{{selectSortTime.month}}月{{selectSortTime.day}}日
       </div>
       <div class="important-btn" :class="{important: editItem.isImportant}" @click="importantChange">
         <span class="iconfont">{{editItem.isImportant ? '&#xe605;' : '&#xe600;'}}</span>
@@ -21,7 +21,7 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import util from '@/util.js'
 let {localStorage} = util
 export default {
@@ -37,9 +37,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(['selectDate', 'year', 'month', 'day', 'week'])
+    ...mapGetters(['selectSortTime'])
   },
   watch: {
+    // 观察父组件
     addOrEdit (val) {
       if (!val) return
       this.init()
@@ -51,6 +52,7 @@ export default {
   },
   methods: {
     init () {
+      let {year, month, day} = this.selectSortTime
       if (this.editKey) {
         // 编辑模式，自动填入数据
         this.editItem = localStorage.get(this.editKey + '')
@@ -62,7 +64,7 @@ export default {
           hasDele: false,
           hasFinished: false,
           isImportant: false,
-          sortTime: {year: this.year, month: this.month, day: this.day}
+          sortTime: {year, month, day}
         }
       }
       this.$refs['input'].focus()

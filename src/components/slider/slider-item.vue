@@ -9,7 +9,7 @@ export default {
     }
   },
   mounted () {
-    // console.log('这里是slider-item')
+    console.log('这里是slider-item：mounted')
   }
 }
 </script>

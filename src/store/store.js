@@ -1,35 +1,30 @@
+// 存放app级别的数据，用于Calendar、todo组件数据共享
 import Vue from 'vue'
 import Vuex from 'vuex'
-import util from '@/util.js'
+import util from '@/util'
 Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     selectDate: new Date(),
-    updateTagKey: (new Date()).getTime(), // 通过修改store中这个时间戳的方式，通知日历组件上的标志
-    year: 0,
-    month: 0,
-    day: 0,
-    week: 0
+    updateCalendarTagKey: 0 // 是时间戳，用于todo组件变化通知calendar告知内部组件dayPicker修改打标信息
   },
   getters: {
-    cnDay (state) {
-      return ['天', '一', '二', '三', '四', '五', '六'][state.week]
-    },
+    // 使用克隆的对象，避免对象被直接更改
     cloneSelectDate (state) {
       return new Date(state.selectDate.getTime())
+    },
+    selectSortTime (state) {
+      let {year, month, day} = util.getYearMonthDayWeek(state.selectDate)
+      return {year, month, day}
     }
   },
   mutations: {
     update (state, payload) {
-      let {year, month, day, week} = util.getYearMonthDayWeek(payload)
       state.selectDate = payload
-      state.year = year
-      state.month = month
-      state.day = day
-      state.week = week
     },
-    updateTag (state) {
-      state.updateTagKey = (new Date()).getTime()
+    updateCalendarTag (state) {
+      console.log('这里是store.js,收到通知修改日历打标数据')
+      state.updateCalendarTagKey = (new Date()).getTime()
     }
   }
 })

@@ -83,6 +83,9 @@ export default {
   },
   mounted () {
     this.initData()
+  },
+  beforeUpdate () {
+    this.initData()
   }
 }
 </script>
@@ -90,6 +93,7 @@ export default {
   .search
     padding  0.2rem .2rem
     .todo-list
+      overflow hidden
       li
         background-color #fff
         min-height .85rem
