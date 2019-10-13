@@ -1,44 +1,50 @@
 <template>
   <div class="search">
     <!-- 这里显示全部的、未删除的事项 -->
-    <template v-if="showAllKey">
+    <template v-if="allTodo.length">
       <div v-for="(item, idx) in dateKeys" v-bind:key="idx">
         <h3>{{item.year}}年{{item.month}}月{{item.day}}日</h3>
-        <ul class="todo-list">
-          <li v-for="todo in allTodo[idx]" v-bind:key="todo.key">
-            <div class="todo-tag iconfont" @click="toFinished(idx)">&#xe71e;</div>
-            <div @click="edit(item.key)"  class="desc">
-              <span>{{todo.data.desc}}</span>
-              <span class="important-desc">{{todo.data.isImportant ? '重要任务' : '一般任务'}}</span>
-            </div>
-            <div class="important-tag iconfont" @click="importantChange(idx)">
-              {{todo.data.isImportant ? '&#xe605;' : '&#xe600;'}}
-            </div>
-            <div class="dele-btn iconfont" @click="removeItem(item.key)">&#xe652;</div>
-          </li>
-        </ul>
+        <todo-item v-for="item in allTodo[idx]" :todoItem="item.data" @desc-click="edit(item.key)"
+        @updateItem="updateItem(item.key, $event)" v-bind:key="item.key"></todo-item>
       </div>
     </template>
-    <!-- 这里显示重要事项 -->
-    <template v-if="!showAllKey">
-
+    <!-- 没有事项时显示的内容 -->
+    <template v-if="!allTodo.length">
+      <p style="text-align:center">{{emptyDesc}}</p>
     </template>
+    <!-- 编辑模块 -->
+    <add v-bind:add-or-edit="addOrEdit" v-bind:edit-key="editKey" @submit="closeEdit" v-show="showEditKey"></add>
   </div>
 </template>
 <script>
 import util from '@/util.js'
 let {localStorage} = util
 export default {
+  components: {
+    todoItem: () => import('./todo-item'),
+    add: () => import('./add')
+  },
   data () {
     return {
       allTodo: [],
       importantTodo: [],
-      dateKeys: []
+      dateKeys: [],
+      // 编辑模块数据
+      addOrEdit: '',
+      editKey: 0,
+      showEditKey: false
     }
   },
   computed: {
-    showAllKey () {
-      return this.$route.query.q === 'all'
+    queryStr () {
+      return this.$route.query.q
+    },
+    emptyDesc () {
+      let temp = ''
+      if (this.queryStr === 'all') temp = 'nice！所有的事情都搞定了'
+      if (this.queryStr === 'finished') temp = '太懒了！还没有完成的事项'
+      if (this.queryStr === 'dele') temp = '暂时没有删除的事项'
+      return temp
     }
   },
   methods: {
@@ -47,12 +53,33 @@ export default {
       let importantTodo = []
       let tempArr = []
       let tempAllTodo = []
-      localStorage.each((val, key) => {
-        if (!val.hasDele && !val.hasFinished && val.type === 'todo') {
-          tempAllTodo.push({key: key, data: val})
-          tempArr.push(JSON.stringify(val.sortTime))
-        }
-      })
+      switch (this.queryStr) {
+        case 'all':
+          localStorage.each((val, key) => {
+            if (!val.hasDele && !val.hasFinished && val.type === 'todo') {
+              tempAllTodo.push({key: +key, data: val})
+              tempArr.push(JSON.stringify(val.sortTime))
+            }
+          })
+          break
+        case 'finished':
+          localStorage.each((val, key) => {
+            if (!val.hasDele && val.hasFinished && val.type === 'todo') {
+              tempAllTodo.push({key: +key, data: val})
+              tempArr.push(JSON.stringify(val.sortTime))
+            }
+          })
+          break
+        case 'dele':
+          localStorage.each((val, key) => {
+            if (val.hasDele && val.type === 'todo') {
+              tempAllTodo.push({key: +key, data: val})
+              tempArr.push(JSON.stringify(val.sortTime))
+            }
+          })
+          break
+      }
+
       // 时间去重
       tempArr = [...new Set(tempArr)]
       // 时间排序
@@ -79,12 +106,49 @@ export default {
       this.dateKeys = tempArr
       this.allTodo = allTodo
       this.importantTodo = importantTodo
+    },
+    updateItem (key, newData) {
+      this.allTodo.forEach((dayTodos) => {
+        for (let [idx, item] of dayTodos.entries()) {
+          if (item.key === key) {
+            if (newData.hasDele) dayTodos.splice(idx, 1)
+            else dayTodos.splice(idx, 1, {key, data: newData})
+          }
+        }
+      })
+      localStorage.set(key, newData)
+    },
+    edit (key) {
+      console.log('这里是search页面，key为：' + key)
+      this.editKey = key
+      this.addOrEdit = 'edit'
+      this.showEditKey = true
+    },
+    closeEdit (newData) {
+      // 提交数据，关闭编辑板块
+      if (newData) {
+        localStorage.set(this.editKey, newData)
+        this.allTodo.forEach((dayTodos) => {
+          for (let [idx, item] of dayTodos.entries()) {
+            if (item.key === this.editKey) {
+              if (newData.hasDele) dayTodos.splice(idx, 1)
+              else dayTodos.splice(idx, 1, {key: this.editKey, data: newData})
+            }
+          }
+        })
+      }
+      this.showEditKey = false
+      this.addOrEdit = ''
+      this.editKey = 0
     }
-  },
+  }, // methods结束
   mounted () {
     this.initData()
   },
   beforeUpdate () {
+    this.initData()
+  },
+  activated () {
     this.initData()
   }
 }

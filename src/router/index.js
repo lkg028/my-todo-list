@@ -8,11 +8,16 @@ export default new Router({
       path: '/',
       name: '首页',
       component: () => import('@/pages/home/Home')
+    },
+    {
+      path: '/search',
+      name: 'todoSearch',
+      component: () => import('@/components/todo/todo-search')
+    },
+    {
+      path: '/author',
+      name: 'todoSearch',
+      component: () => import('@/pages/author/Author')
     }
-    // {
-    //   path: '/search',
-    //   name: 'todoSearch',
-    //   component: () => import('@/pages/todo/todo-search')
-    // }
   ]
 })

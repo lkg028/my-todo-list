@@ -1,21 +1,19 @@
 # my-todo-list
 
-> A Vue.js project
+一个日期选择器和todo-list的结合体
 
-## Build Setup
+[点击查看](lkg028.cn/demo/)运行效果
 
-``` bash
-# install dependencies
-npm install
+<img src="/images/todo.jpg" style="width:280px">
 
-# serve with hot reload at localhost:8080
-npm run dev
 
-# build for production with minification
-npm run build
+#### 使用到的依赖包以及Vue工具
+1. Vuex
+2. Vue-router
+3. fastclick
+4. axios
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+#### 实现的组要Vue组件
+1. 滑动组件
+2. 日历选择组件
+3. todo组件

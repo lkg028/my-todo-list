@@ -12,18 +12,18 @@
         <span class="iconfont">&#xe623;</span>
         全部待办
       </router-link>
-      <li style="color:gray">
+      <router-link to="/search?q=finished" tag="li">
         <span class="iconfont">&#xe60d;</span>
         已完成
-      </li>
-      <li li style="color:gray">
+      </router-link>
+      <router-link to="/search?q=dele" tag="li">
         <span class="iconfont">&#xe652;</span>
         已删除
-      </li>
-      <li li style="color:gray">
+      </router-link>
+      <router-link to="/author" tag="li">
         <span class="iconfont">&#xe603;</span>
         作者他
-      </li>
+      </router-link>
     </ul>
   </div>
 </template>
@@ -45,8 +45,11 @@ export default {
         case 'all':
           temp = '全部待办'
           break
-        case 'delete':
-          temp = '已删除的事项'
+        case 'finished':
+          temp = '已完成'
+          break
+        case 'dele':
+          temp = '已删除'
           break
       }
       if (!temp) {

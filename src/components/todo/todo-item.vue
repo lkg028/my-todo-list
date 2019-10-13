@@ -1,7 +1,9 @@
 <template>
   <div class="wrap">
     <div class="item-container" :class="{'has-finished': todoItem.hasFinished}" v-swipeout>
-      <div class="todo-tag iconfont" @click="toggleFinished">&#xe60d;</div>
+      <div class="todo-tag iconfont" @click="toggleFinished">
+        {{todoItem.hasFinished ? '&#xe60d;' : '&#xe71e;'}}
+      </div>
       <div class="desc" @click="descClick">
         <span class="desc-text">{{todoItem.desc}}</span>
         <span class="desc-tag">{{todoItem.isImportant ? '重要任务' : '一般任务'}}</span>
@@ -32,12 +34,14 @@ export default {
   methods: {
     // 完成/进行中切换
     toggleFinished () {
+      if (this.todoItem.hasDele) return
       let newItem = JSON.parse(JSON.stringify(this.todoItem))
       newItem.hasFinished = !newItem.hasFinished
       this.$emit('updateItem', newItem)
     },
     // 重要/非重要切换
     toggleImportant () {
+      if (this.todoItem.hasDele) return
       if (this.todoItem.hasFinished) return
       let newItem = JSON.parse(JSON.stringify(this.todoItem))
       newItem.isImportant = !newItem.isImportant
@@ -51,6 +55,7 @@ export default {
     },
     // 点击文本的时候，向外促发编辑事件
     descClick () {
+      if (this.todoItem.hasDele) return
       this.$emit('desc-click')
     }
   },

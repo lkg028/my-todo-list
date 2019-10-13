@@ -10,7 +10,7 @@
     <div class="option">
       <div class="assign-date">
         <span class="iconfont">&#xe632;</span>
-        {{selectSortTime.year}}年{{selectSortTime.month}}月{{selectSortTime.day}}日
+        {{year}}年{{month}}月{{day}}日
       </div>
       <div class="important-btn" :class="{important: editItem.isImportant}" @click="importantChange">
         <span class="iconfont">{{editItem.isImportant ? '&#xe605;' : '&#xe600;'}}</span>
@@ -33,7 +33,10 @@ export default {
   },
   data () {
     return {
-      editItem: {}
+      editItem: {},
+      year: 0,
+      month: 0,
+      day: 0
     }
   },
   computed: {
@@ -67,6 +70,9 @@ export default {
           sortTime: {year, month, day}
         }
       }
+      this.year = this.editItem.sortTime.year
+      this.month = this.editItem.sortTime.month
+      this.day = this.editItem.sortTime.day
       this.$refs['input'].focus()
     },
     submit (act) {
