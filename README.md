@@ -4,7 +4,7 @@
 
 [点击查看](lkg028.cn/demo/)运行效果
 
-<img src="/images/todo.jpg" style="width:280px">
+<img src="static/todo.jpg" style="width:280px">
 
 
 #### 使用到的依赖包以及Vue工具
